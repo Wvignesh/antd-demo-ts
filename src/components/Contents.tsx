@@ -11,29 +11,42 @@ import React, { useState } from "react";
 import "../App.css";
 import { Input } from "antd";
 import { Form } from "antd";
-import {FormProps} from '../types/types'
-
-
-const initUser = { email: "", name: "" };
+import { Avatar, List,   } from 'antd';
+import { AiOutlineCloseCircle } from "react-icons/ai";
  
+
+ interface dataType {
+  name: {
+    title: string;
+    first: string;
+    last: string;
+     
+  };
+  
+  
+ }
+
+const initUser = { email: "" , name:"" };
 
 const { Header, Sider, Content } = Layout;
 
-
-
-const Contents: React.FC<FormProps> = ({addAvatar}) => {
+function Contents() {
   const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [formValue, setFormValue] = useState(initUser);
+  const [user, setUser] = useState<dataType[]>([]);
+ 
+
+ 
 
   const showModal = () => {
     setVisible(true);
   };
 
-  const handleOk = (e: React.SyntheticEvent<EventTarget>) => {
+  const handleOk = (e: Event) => {
     e.preventDefault();
-    addAvatar(formValue);
-    setFormValue(initUser);
+   setFormValue(initUser);  
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -45,24 +58,26 @@ const Contents: React.FC<FormProps> = ({addAvatar}) => {
     setVisible(false);
   };
 
-  const [formValue, setFormValue] = useState(initUser);
-
-  
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setFormValue({ ...formValue, [name]: value });
-    };
-  
-    const onFinish = (values: any) => {
-      console.log("Success:", values);
-    };
-  
-    const onFinishFailed = (errorInfo: any) => {
-      console.log("Failed:", errorInfo);
-    };
-  
+    const { name, value } = e.target;
+    setFormValue({ ...formValue, [name]: value });
+   
+  };
+
+   
+  const onFinish = (values: any) => {
+    setUser((users) => [...users, values]);
+     
+    console.log("Success:", values);
+  };
+
+  const onFinishFailed = (errorInfo: any) => {
+    console.log("Failed:", errorInfo);
+  };
 
  
+ 
+
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -97,55 +112,104 @@ const Contents: React.FC<FormProps> = ({addAvatar}) => {
           <span style={{ marginLeft: 40 }}> Add Clauses</span>
           <span style={{ marginLeft: 40 }}> Add Fields</span>
 
-          <Button   onClick={showModal} style={{ marginLeft: 90 }}>
-           <AiOutlineEdit/> Add Signature
+          <Button onClick={showModal} style={{ marginLeft: 90 }}>
+            <AiOutlineEdit /> Add Signature
           </Button>
+
           <Modal
             visible={visible}
             title="Manage Signatories"
-            onOk={handleOk}
+            onOk={() => handleOk}
             onCancel={handleCancel}
             footer={[
-              
               <Button
                 key="submit"
                 loading={loading}
-                onClick={handleOk}
-              > 
+                onClick={() => handleOk}
+                className="mdl-btn-submit"
+              >
                 Send Invite
               </Button>,
-               
             ]}
           >
-            <Form
-              name="basic"
-              wrapperCol={{ span: 16 }}
-              initialValues={{ remember: true }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-            >
-              <Form.Item
-                label="Email"
-                name="Email"
-                rules={[
-                  { required: true, message: "Please input your Email!" },
-                ]}
+            <>
+              <Form
+                name="basic"
+                wrapperCol={{ span: 16 }}
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete="off"
               >
-                <Input
-                  placeholder="Type Email"
-                  value={formValue.email}
-                  onChange={onInputChange}
-                />
-              </Form.Item>
-            </Form>
+                <Form.Item
               
-            
+                  label="Email"
+                  name="email"
+                  rules={[
+                    { required: true, message: "Please input your Email!" },
+                  ]}
+                >
+                  <Input
+                  id="email"
+                    type="email"
+                    name="email" 
+                    placeholder="Type Email"
+                    value={formValue.email}
+                    onChange={onInputChange}
+                  />
+                 
+                </Form.Item>
+              </Form>
+              <p>Invited Contracters</p>
+              <div
+                  id="scrollableDiv"
+                  style={{
+                    height: 300,
+                    overflow: "auto",
+                    display: "flex",
+                    flexDirection: "column-reverse",
+                  }}
+                >
+                   
+                   
+               
+                 
+                    <List
+                      itemLayout="horizontal"
+                      dataSource={user}
+                     
+                      renderItem={(item) => (
+                        <List.Item>
+                          <List.Item.Meta
+                            avatar={
+                              <Avatar src="https://joeschmoe.io/api/v1/random" />
+                            }
+                            title={
+                               Object.name
+                            }
+                            
+                            description= 
+                               {
+                                Object.values(item)
+                               }
+                             
+                          />
+                          <div style={{ fontSize: 20 }}>
+                            {" "}
+                            <AiOutlineCloseCircle />{" "}
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+               
+              
+               </div>
+            </>
           </Modal>
 
           <Button className="head-btn">
             {" "}
-            Save  <AiOutlineDown style={{marginTop:3,  }} />
+            Save <AiOutlineDown style={{ marginTop: 3 }} />
           </Button>
         </Header>
         <Content
@@ -191,13 +255,14 @@ const Contents: React.FC<FormProps> = ({addAvatar}) => {
               illo autem! Sed maxime excepturi sit error soluta aut quis dolores
               qui beatae magnam qui voluptate nihil sed repellat aliquam <br />{" "}
               <br />
-          
             </p>
           </div>
         </Content>
       </Layout>
     </Layout>
   );
-};
+}
 
 export default Contents;
+ 
+
