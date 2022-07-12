@@ -22,11 +22,11 @@ import { AiOutlineCloseCircle } from "react-icons/ai";
     last: string;
      
   };
-  
+  email: string;
   
  }
 
-const initUser = { email: "" , name:"" };
+const initUser = { email: "" , title:"" };
 
 const { Header, Sider, Content } = Layout;
 
@@ -37,14 +37,15 @@ function Contents() {
   const [formValue, setFormValue] = useState(initUser);
   const [user, setUser] = useState<dataType[]>([]);
  
-
  
-
+ 
+  
   const showModal = () => {
     setVisible(true);
   };
 
   const handleOk = (e: Event) => {
+    
     e.preventDefault();
    setFormValue(initUser);  
     setLoading(true);
@@ -58,6 +59,8 @@ function Contents() {
     setVisible(false);
   };
 
+  
+
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormValue({ ...formValue, [name]: value });
@@ -66,16 +69,21 @@ function Contents() {
 
    
   const onFinish = (values: any) => {
+    
     setUser((users) => [...users, values]);
-     
     console.log("Success:", values);
+   
   };
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
   };
 
- 
+ const handleRemove =(index:any)=> {
+  var newList=user;
+  newList.splice(index,1);
+  setUser([...newList])
+ }
  
 
   return (
@@ -141,22 +149,22 @@ function Contents() {
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
               >
+                <label style={{fontSize:16, marginBottom:"10px"}}><strong>Email</strong>  </label> 
                 <Form.Item
-              
-                  label="Email"
                   name="email"
                   rules={[
                     { required: true, message: "Please input your Email!" },
                   ]}
                 >
                   <Input
-                  id="email"
                     type="email"
                     name="email" 
                     placeholder="Type Email"
                     value={formValue.email}
                     onChange={onInputChange}
+                   
                   />
+           
                  
                 </Form.Item>
               </Form>
@@ -167,19 +175,15 @@ function Contents() {
                     height: 300,
                     overflow: "auto",
                     display: "flex",
-                    flexDirection: "column-reverse",
+                    flexDirection: "column",
                   }}
                 >
-                   
-                   
-               
                  
                     <List
                       itemLayout="horizontal"
                       dataSource={user}
-                     
-                      renderItem={(item) => (
-                        <List.Item>
+                      renderItem={(item:dataType) => (
+                        <List.Item >
                           <List.Item.Meta
                             avatar={
                               <Avatar src="https://joeschmoe.io/api/v1/random" />
@@ -194,11 +198,12 @@ function Contents() {
                                }
                              
                           />
-                          <div style={{ fontSize: 20 }}>
+                          <div style={{ fontSize: 20 }}  onClick={(index)=>handleRemove(index)} >
                             {" "}
-                            <AiOutlineCloseCircle />{" "}
+                            <AiOutlineCloseCircle  />{" "}
                           </div>
                         </List.Item>
+                      
                       )}
                     />
                
